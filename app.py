@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, abort
+import chardet
 
 app = Flask(__name__)
 
@@ -10,7 +11,10 @@ def readfile(filename):
     end_line = request.args.get('end_line', default=None, type=int)
 
     try:
-        with open(filename, 'r') as file:
+        with open(filename, 'rb') as f:
+            result = chardet.detect(f.read())
+
+        with open(filename, 'r', encoding=result['encoding']) as file:
             lines = file.readlines()
             content = ''.join(lines[start_line-1:end_line])
     except FileNotFoundError:
